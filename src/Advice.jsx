@@ -3,7 +3,6 @@ import CodeEditor from "./components/CodeEditor";
 import Output from "./components/Output";
 import { Stack } from "@mui/material";
 import './App.css';
-import config from './scripts/config';
 
 function Advice() {
     
@@ -15,7 +14,9 @@ function Advice() {
     const [isProgRunning, setIsProgRunning] = useState(false);
 
     function openSocket() {
-        const socket = new WebSocket(import.meta.env.DEV ? `${config.BASE_URL_WS}` : `${config.BASE_URL_WSS}`);
+        const socket = new WebSocket(
+            import.meta.env.DEV ? `ws://${import.meta.env.VITE_HOST}` : `wss://${import.meta.env.VITE_HOST}`
+        );
         
         socket.onopen = () => {
             setSocket(socket);
@@ -31,7 +32,9 @@ function Advice() {
     }
 
     async function fetchLangs() {
-        const res = await fetch(import.meta.env.DEV ? `${config.BASE_URL_HTTP}/langrunner/info/` : `${config.BASE_URL_HTTPS}/langrunner/info/`, {
+        const res = await fetch(
+            import.meta.env.DEV ? `http://${import.meta.env.VITE_HOST}/langrunner/info/` 
+                : `https://${import.meta.env.VITE_HOST}/langrunner/info/`, {
             headers: {'ngrok-skip-browser-warning': 'true'}
         });
         const langs = await res.json();

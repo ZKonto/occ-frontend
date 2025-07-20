@@ -1,5 +1,5 @@
 import { Editor } from "@monaco-editor/react";
-import '../../scripts/monaco_cdn_to_local'
+import '../scripts/monaco_cdn_to_local'
 import { Button, Stack, Typography, Box, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { useState } from "react";
 

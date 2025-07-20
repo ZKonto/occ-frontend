@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import CodeEditor from "./components/CodeEditor";
 import Output from "./components/Output";
-import { Stack } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import './App.css';
 
 function Advice() {
@@ -35,8 +35,10 @@ function Advice() {
         const res = await fetch(
             import.meta.env.DEV ? `http://${import.meta.env.VITE_HOST}/langrunner/info/` 
                 : `https://${import.meta.env.VITE_HOST}/langrunner/info/`, {
+
             headers: {'ngrok-skip-browser-warning': 'true'}
         });
+
         const langs = await res.json();
         setLangs(langs);
     }
@@ -54,7 +56,7 @@ function Advice() {
 
     return (
         <Stack direction={"row"} height={"100vh"}>
-            <Stack direction={"row"} flexGrow={1}>
+            <Stack direction={"row"} width={"100vw"}>
                 <CodeEditor 
                     lang={lang}
                     setLang={setLang}
@@ -63,7 +65,7 @@ function Advice() {
                     isProgRunning={isProgRunning}
                     setIsProgRunning={setIsProgRunning} 
                     reset={reset}
-                    width="50%" 
+                    width="50%"
                 />
 
                 <Output 
@@ -71,6 +73,7 @@ function Advice() {
                     socket={socket} 
                     isProgRunning={isProgRunning} 
                     setIsProgRunning={setIsProgRunning}
+                    width="50%"
                 />
             </Stack>
         </Stack>

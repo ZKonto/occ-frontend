@@ -4,9 +4,8 @@ import { FitAddon } from "@xterm/addon-fit";
 import { Box, Stack, Typography, Button } from "@mui/material";
 import '@xterm/xterm/css/xterm.css';
 
-function Output({socket, lang, isProgRunning, setIsProgRunning}) {
+function Output({socket, lang, isProgRunning, setIsProgRunning, width="100%"}) {
     const termRef = useRef(null);
-    const fitAddonRef = useRef(null);
     const inputBufferRef = useRef('');
     const [prevLang, setPrevLang] = useState(lang);
     const inputRef = useRef({codeInput: '', language: '', code: "", messageType: 2});
@@ -43,8 +42,7 @@ function Output({socket, lang, isProgRunning, setIsProgRunning}) {
         });
 
         termRef.current = term;
-        fitAddonRef.current = fitAddon;
-        
+
         return () => {
             term.dispose();
             window.removeEventListener('resize', () => fitAddon.fit());
@@ -124,7 +122,7 @@ function Output({socket, lang, isProgRunning, setIsProgRunning}) {
     }, [socket, lang, prevLang]);
 
     return (
-        <Stack flexGrow={1}>
+        <Stack width={width}>
             <Box borderBottom={"1px solid grey"} bgcolor={"#f0f0f0"}>
                 <Stack direction={"row"} width={"50%"} p={1} alignItems={"center"} spacing={2}>
                     <Typography 

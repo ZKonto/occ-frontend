@@ -4,26 +4,34 @@ import { FitAddon } from "@xterm/addon-fit";
 import { Box, Stack, Typography, Button } from "@mui/material";
 import '@xterm/xterm/css/xterm.css';
 
-function Output({socket, lang, isProgRunning, setIsProgRunning, width="100%"}) {
+function Output({
+    socket, 
+    lang, 
+    progState,
+    width="100%",
+    termRefProp
+
+}) {
+    const [isProgRunning, setIsProgRunning] = progState;
     const termRef = useRef(null);
     const inputBufferRef = useRef('');
-    const [prevLang, setPrevLang] = useState(lang);
+    // const [prevLang, setPrevLang] = useState(lang);
     const inputRef = useRef({codeInput: '', language: '', code: "", messageType: 2});
 
-    useEffect(() => {
-        if(socket !== null && termRef !== null) {
-            if(!isProgRunning) {
-                setPrevLang(lang);
-                termRef.current.reset(); 
-            }
-            else {
-                inputRef.current.messageType = 2;
-                inputRef.current.language = prevLang;
+    // useEffect(() => {
+    //     if(socket !== null && termRef.current !== null) {
+    //         if(!isProgRunning) {
+    //             setPrevLang(lang);
+    //             termRef.current.reset(); 
+    //         }
+    //         else {
+    //             inputRef.current.messageType = 2;
+    //             inputRef.current.language = prevLang;
                 
-                socket.send(JSON.stringify(inputRef.current));
-            }
-        }
-    }, [socket, lang]);
+    //             socket.send(JSON.stringify(inputRef.current));
+    //         }
+    //     }
+    // }, [socket, lang]);
      
     useEffect(() => {
         const term = new Terminal({
@@ -42,6 +50,7 @@ function Output({socket, lang, isProgRunning, setIsProgRunning, width="100%"}) {
         });
 
         termRef.current = term;
+        termRefProp.current = term;
 
         return () => {
             term.dispose();
@@ -55,17 +64,17 @@ function Output({socket, lang, isProgRunning, setIsProgRunning, width="100%"}) {
         if(socket === null && termRef.current !== null) {
             termRef.current.write("Connection to Server failed!\r\n");
         }
-        else {
+        else if(termRef.current !== null) {
             socket.onmessage = (event) => {
                 const output = JSON.parse(event.data);
                 
                 if(output.terminated) {
                     
-                    if(lang !== prevLang) {
-                        setPrevLang(lang);
-                        termRef.current.reset(); 
-                    }
-                    else {
+                    // if(lang !== prevLang) {
+                    //     setPrevLang(lang);
+                    //     termRef.current.reset(); 
+                    // }
+                    // else {
                         if(Number.isInteger(Number(output.str))) {
                             termRef.current.write("\r\nExit Code: " + output.str);
                         }
@@ -73,7 +82,7 @@ function Output({socket, lang, isProgRunning, setIsProgRunning, width="100%"}) {
                             termRef.current.write("\r\n" + output.str);
                         }
                         termRef.current.write("\r\n" + '='.repeat(termRef.current.cols - 1) + "\r\n\n");
-                    }
+                    // }
 
                     setIsProgRunning(false);
                 }
@@ -93,7 +102,7 @@ function Output({socket, lang, isProgRunning, setIsProgRunning, width="100%"}) {
                     if(inputBufferRef.current.length != 0) {
                         inputRef.current.codeInput = inputBufferRef.current + "\n";
                         inputRef.current.messageType = 1;
-                        inputRef.current.language = prevLang;
+                        inputRef.current.language = lang;
     
                         socket.send(JSON.stringify(inputRef.current));
                         inputBufferRef.current = ''; // Clear buffer
@@ -119,39 +128,18 @@ function Output({socket, lang, isProgRunning, setIsProgRunning, width="100%"}) {
             if(socket !== null)
                 socket.onmessage = undefined;
         }
-    }, [socket, lang, prevLang]);
+    }, [socket, lang]);
 
     return (
-        <Stack width={width}>
-            <Box borderBottom={"1px solid grey"} bgcolor={"#f0f0f0"}>
-                <Stack direction={"row"} width={"50%"} p={1} alignItems={"center"} spacing={2}>
-                    <Typography 
-                        fontFamily={"Fira Mono"} 
-                        fontSize={25} 
-                        color={"#003c52"} 
-                        fontWeight={500}
-                    >
-                        Output
-                    </Typography>
-                    <Button 
-                        size={"small"} 
-                        variant="outlined"
-                        onClick={(e) => termRef.current.reset()}
-                        color="inherit"
-                    >
-                        Clear 
-                    </Button>
-                </Stack> 
-            </Box>
-            <Box 
-                height={"100%"}
-                bgcolor={" #333333"}
-                pl={"2%"}
-                pt={"2%"}
-            >
-                <Box id="terminal" height={"100%"} />
-            </Box>
-        </Stack>
+        <Box 
+            height={"100%"}
+            width={width}
+            bgcolor={" #333333"}
+            pl={"1%"}
+            pt={"1%"}
+        >
+            <Box id="terminal" height={"100%"} />
+        </Box>
     )
 }
 

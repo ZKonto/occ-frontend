@@ -5,10 +5,11 @@ import { Box, Button, FormControl, InputLabel, MenuItem, Select, Stack, Typograp
 import './App.css';
 import {vertSplitModel} from "./resources/layoutModel";
 import { Layout } from "flexlayout-react";
+import { AppContext } from "./context/AppContext";
 import "flexlayout-react/style/light.css";
 
-const LayoutMemo = memo(function LayoutMemo({model, factory}) {
-    return <Layout model={model} factory={factory} onRenderDragRect={() => console.log("drag")}/>
+const LayoutMemo = memo(function LayoutMemo({model, factory, onModelChange}) {
+    return <Layout model={model} factory={factory} onModelChange={onModelChange}/>
 });
 
 function Advice() {
@@ -21,6 +22,7 @@ function Advice() {
 
     const codeRef = useRef('');
     const termRef = useRef(null);
+    const fitAddonRef = useRef(null);
 
     function openSocket() {
         const socket = new WebSocket(
@@ -98,18 +100,14 @@ function Advice() {
         let component = node.getComponent();
 
         if(component === "Editor") {
-            return <CodeEditor 
-                        lang={lang}
-                        codeRef={codeRef} 
-                    />
+            return <CodeEditor codeRef={codeRef} />
         }
 
         if(component === "Output") {
             return <Output 
-                        lang={lang} 
-                        socket={socket}
-                        progState={[isProgRunning, setIsProgRunning]}
-                        termRefProp={termRef}
+                        setIsProgRunning={setIsProgRunning} 
+                        termRefProp={termRef} 
+                        fitAddonRefProp={fitAddonRef}
                     />
         }
     }, [lang, socket]);
@@ -123,7 +121,8 @@ function Advice() {
     }
 
     if(termReset && !isProgRunning) {
-        termRef.current.reset();
+        if(termRef.current !== null)
+            termRef.current.reset();
         setTermReset(false);
     }
 
@@ -147,7 +146,7 @@ function Advice() {
                     code_checkout
                 </Typography>
 
-                <FormControl size="small" sx={{minWidth: "12%"}}>
+                <FormControl size="small" sx={{width: "12%"}}>
                     <InputLabel id="language-selected">language</InputLabel>
                     <Select
                     labelId="language-selected"
@@ -183,10 +182,15 @@ function Advice() {
 
             </Stack>
             <Box height={"100%"} position={"relative"}>
-                <LayoutMemo 
-                    model={vertSplitModel} 
-                    factory={nodeFactory} 
-                />
+                <AppContext.Provider value={{lang: lang, socket: socket, theme: ""}}>
+                    <LayoutMemo 
+                        model={vertSplitModel} 
+                        factory={nodeFactory} 
+                        onModelChange={(model, action) => {
+                            fitAddonRef.current.fit();
+                        }}
+                    />
+                </AppContext.Provider>
             </Box>
         </Stack>
     ); 

@@ -1,38 +1,15 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useContext } from "react";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import { Box, Stack, Typography, Button } from "@mui/material";
 import '@xterm/xterm/css/xterm.css';
+import { AppContext } from "../context/AppContext";
 
-function Output({
-    socket, 
-    lang, 
-    progState,
-    width="100%",
-    termRefProp
-
-}) {
-    const [isProgRunning, setIsProgRunning] = progState;
+function Output({setIsProgRunning, termRefProp, fitAddonRefProp, width="100%", height="100%"}) {
+    const {lang, socket} = useContext(AppContext);
     const termRef = useRef(null);
     const inputBufferRef = useRef('');
-    // const [prevLang, setPrevLang] = useState(lang);
-    const inputRef = useRef({codeInput: '', language: '', code: "", messageType: 2});
 
-    // useEffect(() => {
-    //     if(socket !== null && termRef.current !== null) {
-    //         if(!isProgRunning) {
-    //             setPrevLang(lang);
-    //             termRef.current.reset(); 
-    //         }
-    //         else {
-    //             inputRef.current.messageType = 2;
-    //             inputRef.current.language = prevLang;
-                
-    //             socket.send(JSON.stringify(inputRef.current));
-    //         }
-    //     }
-    // }, [socket, lang]);
-     
     useEffect(() => {
         const term = new Terminal({
             cursorBlink: true,
@@ -51,6 +28,7 @@ function Output({
 
         termRef.current = term;
         termRefProp.current = term;
+        fitAddonRefProp.current = fitAddon;
 
         return () => {
             term.dispose();
@@ -95,29 +73,36 @@ function Output({
             };
     
             disposable = termRef.current.onData(data => {
-                if (data === '\r') { 
-                    // User pressed Enter
-                    // const toSend = inputBufferRef.current + '\n'; // Add newline
-    
-                    if(inputBufferRef.current.length != 0) {
-                        inputRef.current.codeInput = inputBufferRef.current + "\n";
-                        inputRef.current.messageType = 1;
-                        inputRef.current.language = lang;
-    
-                        socket.send(JSON.stringify(inputRef.current));
-                        inputBufferRef.current = ''; // Clear buffer
+                for (const char of data) {
+                    console.log(char === '\r');
+
+                    if (char === '\r') { 
+                        // User pressed Enter
+                        // const toSend = inputBufferRef.current + '\n'; // Add newline
+                        if(inputBufferRef.current.length != 0) {
+
+                            let data = {
+                                code: "",
+                                language: lang,
+                                codeInput: inputBufferRef.current + "\n",
+                                messageType: 1
+                            }
+                        
+                            socket.send(JSON.stringify(data));
+                            inputBufferRef.current = ''; // Clear buffer
+                        }
+                    
+                        termRef.current.write("\r\n");
+                    } else if (char === '\u007f') {
+                        // Handle Backspace
+                        if (inputBufferRef.current.length > 0) {
+                            inputBufferRef.current = inputBufferRef.current.slice(0, -1);
+                            termRef.current.write('\b \b'); // Delete character visually
+                        }
+                    } else {
+                        inputBufferRef.current += char; // Accumulate user typing
+                        termRef.current.write(char); // Echo on terminal
                     }
-    
-                    termRef.current.write("\r\n");
-                } else if (data === '\u007f') {
-                    // Handle Backspace
-                    if (inputBufferRef.current.length > 0) {
-                        inputBufferRef.current = inputBufferRef.current.slice(0, -1);
-                        termRef.current.write('\b \b'); // Delete character visually
-                    }
-                } else {
-                    inputBufferRef.current += data; // Accumulate user typing
-                    termRef.current.write(data); // Echo on terminal
                 }
             });
         }
@@ -132,13 +117,13 @@ function Output({
 
     return (
         <Box 
-            height={"100%"}
+            height={height}
             width={width}
-            bgcolor={" #333333"}
+            bgcolor={"#333333"}
             pl={"1%"}
             pt={"1%"}
         >
-            <Box id="terminal" height={"100%"} />
+            <Box id="terminal" height={"100%"} overflow={"hidden"}/>
         </Box>
     )
 }

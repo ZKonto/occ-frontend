@@ -1,15 +1,12 @@
 import { Editor } from "@monaco-editor/react";
 import '../resources/monaco_cdn_to_local'
 import { Stack,} from "@mui/material";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AppContext } from "../context/AppContext";
 
 // memo
-function CodeEditor({lang, 
-                    codeRef,
-                    width="100%",
-                    height="100%"}) {
-    
-    
+function CodeEditor({codeRef, width="100%",height="100%"}) {
+    const {lang} = useContext(AppContext);
     const [code, setCode] = useState('');
     
     function updateCode(code) {

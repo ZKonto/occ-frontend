@@ -6,7 +6,7 @@ import '@xterm/xterm/css/xterm.css';
 import { AppContext } from "../context/AppContext";
 
 function Output({setIsProgRunning, termRefProp, fitAddonRefProp, width="100%", height="100%"}) {
-    const {lang, socket} = useContext(AppContext);
+    const {lang, socket, interactive} = useContext(AppContext);
     const termRef = useRef(null);
     const inputBufferRef = useRef('');
 
@@ -73,6 +73,9 @@ function Output({setIsProgRunning, termRefProp, fitAddonRefProp, width="100%", h
             };
     
             disposable = termRef.current.onData(data => {
+                if(!interactive)
+                    return;
+
                 for (const char of data) {
                     console.log(char === '\r');
 
@@ -113,7 +116,7 @@ function Output({setIsProgRunning, termRefProp, fitAddonRefProp, width="100%", h
             if(socket !== null)
                 socket.onmessage = undefined;
         }
-    }, [socket, lang]);
+    }, [socket, lang, interactive]);
 
     return (
         <Box 

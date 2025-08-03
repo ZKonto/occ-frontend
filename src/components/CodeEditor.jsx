@@ -8,10 +8,17 @@ import getLangTemplate from "../resources/LangTemplates";
 function CodeEditor({codeRef, width="100%",height="100%"}) {
     const {lang} = useContext(AppContext);
     const [code, setCode] = useState('');
+    const [init, setInit] = useState(true);
     
     function updateCode(code) {
-        setCode(code);
-        codeRef.current = code;
+        if(init) {
+            setCode(codeRef.current);
+            setInit(false);
+        }
+        else {
+            setCode(code);
+            codeRef.current = code;
+        }
     }
     
     useEffect(() => {

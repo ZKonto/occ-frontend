@@ -31,7 +31,7 @@ function Advice() {
     const [isProgRunning, setIsProgRunning] = useState(false);
     const [killSent, setKillSent] = useState(false);
     const [termReset, setTermReset] = useState(false);
-    const [termResetOnRun, setTermResetOnRun] = useState(false);
+    const [termResetOnRun, setTermResetOnRun] = useState(true);
     const [interactive, setInteractive] = useState(true);
 
     const codeRef = useRef("");
@@ -53,10 +53,12 @@ function Advice() {
 
         socket.onclose = () => {
             setSocket(null);
+            setIsProgRunning(false);
         };
 
         socket.onerror = () => {
             setSocket(null);
+            setIsProgRunning(false);
         };
     }
 
@@ -90,7 +92,7 @@ function Advice() {
                 code: "",
                 language: lang,
                 codeInput: "",
-                messageType: 2,
+                messageType: 3,
             };
 
             setKillSent(true);
@@ -103,8 +105,8 @@ function Advice() {
             let data = {
                 code: codeRef.current,
                 language: lang,
-                codeInput: "",
-                messageType: 0,
+                codeInput: interactive ? "" : inputRef.current,
+                messageType: interactive ? 0 : 1,
             };
 
             if (termResetOnRun) resetTerm();
@@ -219,7 +221,7 @@ function Advice() {
                                 }
                             />
                         }
-                        label="interactive"
+                        label="Interactive"
                     />
                 </FormControl>
 
@@ -235,7 +237,7 @@ function Advice() {
                                 }
                             />
                         }
-                        label="clear on run"
+                        label="Autoclear"
                     />
                 </FormControl>
 

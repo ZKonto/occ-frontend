@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useContext } from "react";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
-import { Box, Stack, Typography, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import "@xterm/xterm/css/xterm.css";
 import { AppContext } from "../context/AppContext";
 

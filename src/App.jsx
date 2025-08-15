@@ -5,12 +5,10 @@ import {
     Box,
     Button,
     FormControl,
-    FormControlLabel,
     InputLabel,
     MenuItem,
     Select,
     Stack,
-    Switch,
     Typography,
 } from "@mui/material";
 import "./App.css";
@@ -20,6 +18,7 @@ import { Layout } from "flexlayout-react";
 import { AppContext } from "./context/AppContext";
 import "flexlayout-react/style/light.css";
 import InputEditor from "./components/InputEditor";
+import ConfigModal from "./components/ConfigModal";
 
 const LayoutMemo = memo(function LayoutMemo(props) {
     return <Layout {...props} />;
@@ -147,7 +146,7 @@ function Advice() {
         },
         [lang, socket],
     );
-
+    console.log(interactive, termResetOnRun);
     useEffect(() => {
         initialize();
     }, []);
@@ -168,22 +167,27 @@ function Advice() {
                 width={"100%"}
                 p={1}
                 alignItems={"center"}
-                spacing={2}
+                spacing={{ xs: 0.8, md: 2 }}
                 bgcolor={"#dedede"}
                 position={"relative"}
+                flexWrap={"wrap"}
             >
                 <Typography
                     fontFamily={"Fira Mono"}
-                    fontSize={25}
                     color={"#003c52"}
                     fontWeight={500}
+                    width={{ xs: "100%", md: "unset" }}
+                    flexGrow={1}
+                    sx={{
+                        fontSize: "clamp(1.5rem, 1.5vw, 2rem)",
+                    }}
                 >
                     code_checkout
                 </Typography>
 
                 <FormControl
                     size="small"
-                    sx={{ width: "12%" }}
+                    sx={{ width: { xs: "40%", md: "15%" } }}
                     disabled={isProgRunning}
                 >
                     <InputLabel id="language-selected">language</InputLabel>
@@ -204,42 +208,6 @@ function Advice() {
                                 );
                             })}
                     </Select>
-                </FormControl>
-
-                <FormControl
-                    size="small"
-                    disabled={isProgRunning}
-                    sx={{ display: "flex", flexDirection: "row" }}
-                >
-                    <FormControlLabel
-                        control={
-                            <Switch
-                                defaultChecked
-                                onChange={() =>
-                                    setInteractive(
-                                        (interactive) => !interactive,
-                                    )
-                                }
-                            />
-                        }
-                        label="Interactive"
-                    />
-                </FormControl>
-
-                <FormControl size="small" disabled={isProgRunning}>
-                    <FormControlLabel
-                        control={
-                            <Switch
-                                defaultChecked
-                                onChange={() =>
-                                    setTermResetOnRun(
-                                        (termResetOnRun) => !termResetOnRun,
-                                    )
-                                }
-                            />
-                        }
-                        label="Autoclear"
-                    />
                 </FormControl>
 
                 <Button
@@ -276,6 +244,11 @@ function Advice() {
                 >
                     Clear
                 </Button>
+                <ConfigModal
+                    isProgRunning={false}
+                    termResetOnRunState={[termResetOnRun, setTermResetOnRun]}
+                    interactiveState={[interactive, setInteractive]}
+                />
             </Stack>
             <Box height={"100%"} position={"relative"}>
                 <AppContext.Provider

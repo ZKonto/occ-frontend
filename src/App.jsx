@@ -177,7 +177,11 @@ function Advice() {
                     </Typography>
                 }
                 langSelector={
-                    <FormControl size="small" fullWidth disabled={true}>
+                    <FormControl
+                        size="small"
+                        fullWidth
+                        disabled={isProgRunning}
+                    >
                         <InputLabel id="language-selected">language</InputLabel>
                         <Select
                             labelId="language-selected"

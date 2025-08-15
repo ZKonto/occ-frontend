@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import "./App.css";
 import { vertSplitModel2 } from "./layouts/vertSplitModel2";
+import { horizontalSplitModel } from "./layouts/horizontalSplitModel";
 import { Layout } from "flexlayout-react";
 import { AppContext } from "./context/AppContext";
 import "flexlayout-react/style/light.css";
@@ -161,7 +162,7 @@ function Advice() {
     }
 
     return (
-        <Stack direction={"column"} height={"100vh"} width={"100vw"}>
+        <Stack direction={"column"} height={"100dvh"} width={"100vw"}>
             <Stack
                 direction={"row"}
                 width={"100%"}
@@ -286,7 +287,11 @@ function Advice() {
                     }}
                 >
                     <LayoutMemo
-                        model={vertSplitModel2}
+                        model={
+                            window.innerWidth > 1050
+                                ? vertSplitModel2
+                                : horizontalSplitModel
+                        }
                         factory={nodeFactory}
                         onModelChange={(model, action) => {
                             fitAddonRef.current.fit();

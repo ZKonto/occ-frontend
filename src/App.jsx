@@ -19,6 +19,7 @@ import { AppContext } from "./context/AppContext";
 import "flexlayout-react/style/light.css";
 import InputEditor from "./components/InputEditor";
 import ConfigModal from "./components/ConfigModal";
+import Header from "./components/Header";
 
 const LayoutMemo = memo(function LayoutMemo(props) {
     return <Layout {...props} />;
@@ -162,94 +163,89 @@ function Advice() {
 
     return (
         <Stack direction={"column"} height={"100dvh"} width={"100vw"}>
-            <Stack
-                direction={"row"}
-                width={"100%"}
-                p={1}
-                alignItems={"center"}
-                spacing={{ xs: 0.8, md: 2 }}
-                bgcolor={"#dedede"}
-                position={"relative"}
-                flexWrap={"wrap"}
-            >
-                <Typography
-                    fontFamily={"Fira Mono"}
-                    color={"#003c52"}
-                    fontWeight={500}
-                    width={{ xs: "100%", md: "unset" }}
-                    flexGrow={1}
-                    sx={{
-                        fontSize: "clamp(1.5rem, 1.5vw, 2rem)",
-                    }}
-                >
-                    code_checkout
-                </Typography>
-
-                <FormControl
-                    size="small"
-                    sx={{ width: { xs: "40%", md: "15%" } }}
-                    disabled={isProgRunning}
-                >
-                    <InputLabel id="language-selected">language</InputLabel>
-                    <Select
-                        labelId="language-selected"
-                        id="demo-simple-select"
-                        value={lang}
-                        label="language"
-                        onChange={handleLangChange}
+            <Header
+                brand={
+                    <Typography
+                        fontFamily={"Fira Mono"}
+                        color={"#003c52"}
+                        fontWeight={500}
+                        sx={{
+                            fontSize: "clamp(2rem, 1.5vw, 2.5rem)",
+                        }}
                     >
-                        {Object.entries(langs)
-                            .sort()
-                            .map(([l, [runner, version]]) => {
-                                return (
-                                    <MenuItem value={l} key={l}>
-                                        {l} ({runner} {version})
-                                    </MenuItem>
-                                );
-                            })}
-                    </Select>
-                </FormControl>
-
-                <Button
-                    size={"small"}
-                    variant="contained"
-                    onClick={
-                        socket === null
-                            ? initialize
+                        code_checkout
+                    </Typography>
+                }
+                langSelector={
+                    <FormControl size="small" fullWidth disabled={true}>
+                        <InputLabel id="language-selected">language</InputLabel>
+                        <Select
+                            labelId="language-selected"
+                            id="demo-simple-select"
+                            value={lang}
+                            label="language"
+                            onChange={handleLangChange}
+                        >
+                            {Object.entries(langs)
+                                .sort()
+                                .map(([l, [runner, version]]) => {
+                                    return (
+                                        <MenuItem value={l} key={l}>
+                                            {l} ({runner} {version})
+                                        </MenuItem>
+                                    );
+                                })}
+                        </Select>
+                    </FormControl>
+                }
+                runButton={
+                    <Button
+                        size={"small"}
+                        variant="contained"
+                        onClick={
+                            socket === null
+                                ? initialize
+                                : isProgRunning
+                                  ? handleKill
+                                  : handleRun
+                        }
+                        color={
+                            socket === null
+                                ? "error"
+                                : isProgRunning
+                                  ? "error"
+                                  : "info"
+                        }
+                        disabled={killSent}
+                    >
+                        {socket === null
+                            ? "Connect"
                             : isProgRunning
-                              ? handleKill
-                              : handleRun
-                    }
-                    color={
-                        socket === null
-                            ? "error"
-                            : isProgRunning
-                              ? "error"
-                              : "info"
-                    }
-                    disabled={killSent}
-                >
-                    {socket === null
-                        ? "Connect"
-                        : isProgRunning
-                          ? "Kill"
-                          : "Run"}
-                </Button>
-
-                <Button
-                    size={"small"}
-                    variant="outlined"
-                    onClick={(e) => termRef.current.reset()}
-                    color="inherit"
-                >
-                    Clear
-                </Button>
-                <ConfigModal
-                    isProgRunning={false}
-                    termResetOnRunState={[termResetOnRun, setTermResetOnRun]}
-                    interactiveState={[interactive, setInteractive]}
-                />
-            </Stack>
+                              ? "Kill"
+                              : "Run"}
+                    </Button>
+                }
+                clearButton={
+                    <Button
+                        size={"small"}
+                        variant="outlined"
+                        onClick={(e) => termRef.current.reset()}
+                        color="inherit"
+                    >
+                        Clear
+                    </Button>
+                }
+                config={
+                    <ConfigModal
+                        isProgRunning={false}
+                        termResetOnRunState={[
+                            termResetOnRun,
+                            setTermResetOnRun,
+                        ]}
+                        interactiveState={[interactive, setInteractive]}
+                    />
+                }
+            />
             <Box height={"100%"} position={"relative"}>
                 <AppContext.Provider
                     value={{

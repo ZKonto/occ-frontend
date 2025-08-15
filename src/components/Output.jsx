@@ -19,7 +19,7 @@ function Output({
     useEffect(() => {
         const term = new Terminal({
             cursorBlink: true,
-            fontSize: 16,
+            fontSize: Math.max((0.8 / 100) * window.innerWidth, 15),
             theme: { background: "#333333" },
         });
         const fitAddon = new FitAddon();

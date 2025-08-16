@@ -26,7 +26,11 @@ function ConfigModal({ isProgRunning, interactiveState, termResetOnRunState }) {
     return (
         <div>
             <IconButton id="basic-button" onClick={handleClick}>
-                <SettingsRoundedIcon />
+                <SettingsRoundedIcon
+                    sx={{
+                        fontSize: "1.4rem",
+                    }}
+                />
             </IconButton>
             <Menu
                 id="basic-menu"

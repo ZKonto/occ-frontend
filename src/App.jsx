@@ -170,13 +170,13 @@ function Advice() {
                         color={"#003c52"}
                         fontWeight={500}
                         sx={{
-                            fontSize: "clamp(2rem, 1.5vw, 2.5rem)",
+                            fontSize: "clamp(1rem, 1.5vw, 2rem)",
                         }}
                     >
                         code_checkout
                     </Typography>
                 }
-                langSelector={
+                item1={
                     <FormControl
                         size="small"
                         fullWidth
@@ -202,10 +202,13 @@ function Advice() {
                         </Select>
                     </FormControl>
                 }
-                runButton={
+                item2={
                     <Button
                         size={"small"}
                         variant="contained"
+                        sx={{
+                            fontSize: "clamp(0.6rem, 1.5vw, 0.8rem)",
+                        }}
                         onClick={
                             socket === null
                                 ? initialize
@@ -229,17 +232,20 @@ function Advice() {
                               : "Run"}
                     </Button>
                 }
-                clearButton={
+                item3={
                     <Button
                         size={"small"}
                         variant="outlined"
                         onClick={(e) => termRef.current.reset()}
                         color="inherit"
+                        sx={{
+                            fontSize: "clamp(0.6rem, 1.5vw, 0.8rem)",
+                        }}
                     >
                         Clear
                     </Button>
                 }
-                config={
+                item4={
                     <ConfigModal
                         isProgRunning={false}
                         termResetOnRunState={[
